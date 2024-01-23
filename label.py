@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import os
 
 
 def fit_image(event):
@@ -64,7 +65,7 @@ def drag(event):
     if len(lines) == 4:
         canvas.coords(rect, rect_coords())
         canvas.tag_raise(rect)
-        print(normalised_rect_coords())
+        print(xywh_rect_coords())
 
 
 def undo(event):
@@ -84,22 +85,29 @@ def rect_coords():
     return x1, y1, x2, y2
 
 
-def normalised_rect_coords():
+def xywh_rect_coords():
     n_coords = []
-    for i, c in enumerate(rect_coords()):
-        if i % 2 == 0:
-            n_coords.append(c / canvas.winfo_width())
-        else:
-            n_coords.append(c / canvas.winfo_height())
+    x1, y1, x2, y2 = rect_coords()
+    n_coords.append((x1 + x2) / (2 * canvas.winfo_width()))
+    n_coords.append((y1 + y2) / (2 * canvas.winfo_height()))
+    n_coords.append(abs(x1 - x2) / canvas.winfo_width())
+    n_coords.append(abs(y1 - y2) / canvas.winfo_height())
     return n_coords
 
 
 def save(event):
     if len(lines) == 4:
-        with open("labels.csv", "a") as f:
-            f.write(f"test_name,{','.join(str(c) for c in normalised_rect_coords())}\n")
+        path = os.path.join(DATASET_PATH, FILE_NAME + ".txt")
+        with open(path, "w") as f:
+            f.write(f"{CLASS_NAME} {' '.join(str(c) for c in xywh_rect_coords())}\n")
             f.close()
 
+
+# TODO: remove hardcoded paths and names
+DATASET_NAME = "test"
+DATASET_PATH = "dataset"
+FILE_NAME = "test_file"
+CLASS_NAME = 0
 
 # Main window
 root = tk.Tk()
@@ -112,7 +120,7 @@ screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 # load image
-image = Image.open("20230828_155817.jpg")
+image = Image.open("dataset/20230828_155817.jpg")
 image_ratio = image.width / image.height
 
 tk_image = ImageTk.PhotoImage(image)

@@ -3,104 +3,156 @@ from PIL import Image, ImageTk
 import os
 
 
-def fit_image(event):
-    global new_image
-    canvas_width = event.width
-    canvas_height = int(canvas_width / image_ratio)
-    scaling_factor = canvas_width / image.width
-    root.geometry(f"{canvas_width}x{canvas_height}")
+class LabelingApp:
+    def __init__(self, dataset_name, dataset_path, file_name, class_name):
+        self.dataset_name = dataset_name
+        self.dataset_path = dataset_path
+        self.file_name = file_name
+        self.class_name = class_name
 
-    # Resize the image
-    new_width = int(image.width * scaling_factor)
-    new_height = int(image.height * scaling_factor)
-    resized_image = image.resize((new_width, new_height))
-    new_image = ImageTk.PhotoImage(resized_image)
+        self.root = tk.Tk()
+        self.root.title("Labeling Tool")
+        self.root.resizable(True, False)
 
-    # update the canvas image
-    canvas.itemconfig(image_item, image=new_image)
+        self.screen_width = self.root.winfo_screenwidth()
+        self.screen_height = self.root.winfo_screenheight()
 
+        self.image = Image.open(
+            # os.path.join(self.dataset_path, self.file_name + ".jpg")
+            "dataset\\20230828_155817.jpg"
+        )
+        self.image_ratio = self.image.width / self.image.height
 
-def click(event):
-    coords["x1"] = event.x
-    coords["y1"] = event.y
+        self.tk_image = ImageTk.PhotoImage(self.image)
 
-    if len(lines) != 4:
-        if len(lines) % 2 == 0:
-            lines.append(
-                canvas.create_line(
-                    0,
-                    coords["y1"],
-                    canvas.winfo_width(),
-                    coords["y1"],
-                    fill="lawn green",
-                    width=2,
+        self.canvas = tk.Canvas(
+            self.root,
+            width=self.screen_height * 0.75 * self.image_ratio,
+            height=self.screen_height * 0.75,
+        )
+        self.canvas.pack(expand=tk.YES, fill=tk.BOTH)
+
+        self.image_item = self.canvas.create_image(
+            0, 0, anchor=tk.NW, image=self.tk_image
+        )
+
+        self.lines = []
+        self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
+
+        self.rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
+
+        self.new_image = None
+
+        self.canvas.bind("<Configure>", self.fit_image)
+        self.canvas.bind("<Button-1>", self.click)
+        self.canvas.bind("<B1-Motion>", self.drag)
+        self.root.bind("a", self.undo)
+        self.root.bind("<space>", self.save)
+
+    def fit_image(self, event):
+        canvas_width = event.width
+        canvas_height = int(canvas_width / self.image_ratio)
+        scaling_factor = canvas_width / self.image.width
+        self.root.geometry(f"{canvas_width}x{canvas_height}")
+
+        new_width = int(self.image.width * scaling_factor)
+        new_height = int(self.image.height * scaling_factor)
+        resized_image = self.image.resize((new_width, new_height))
+        self.new_image = ImageTk.PhotoImage(resized_image)
+
+        self.canvas.itemconfig(self.image_item, image=self.new_image)
+
+    def click(self, event):
+        self.coords["x1"] = event.x
+        self.coords["y1"] = event.y
+
+        if len(self.lines) != 4:
+            if len(self.lines) % 2 == 0:
+                self.lines.append(
+                    self.canvas.create_line(
+                        0,
+                        self.coords["y1"],
+                        self.canvas.winfo_width(),
+                        self.coords["y1"],
+                        fill="lawn green",
+                        width=2,
+                    )
                 )
+            else:
+                self.lines.append(
+                    self.canvas.create_line(
+                        self.coords["x1"],
+                        0,
+                        self.coords["x1"],
+                        self.canvas.winfo_height(),
+                        fill="lawn green",
+                        width=2,
+                    )
+                )
+
+        if len(self.lines) == 4:
+            self.canvas.coords(self.rect, self.rect_coords())
+            self.canvas.tag_raise(self.rect)
+
+    def drag(self, event):
+        self.coords["x2"] = event.x
+        self.coords["y2"] = event.y
+
+        if len(self.lines) % 2 != 0:
+            self.canvas.coords(
+                self.lines[-1],
+                0,
+                self.coords["y2"],
+                self.canvas.winfo_width(),
+                self.coords["y2"],
             )
         else:
-            lines.append(
-                canvas.create_line(
-                    coords["x1"],
-                    0,
-                    coords["x1"],
-                    canvas.winfo_height(),
-                    fill="lawn green",
-                    width=2,
-                )
+            self.canvas.coords(
+                self.lines[-1],
+                self.coords["x2"],
+                0,
+                self.coords["x2"],
+                self.canvas.winfo_height(),
             )
 
-    if len(lines) == 4:
-        canvas.coords(rect, rect_coords())
-        canvas.tag_raise(rect)
+        if len(self.lines) == 4:
+            self.canvas.coords(self.rect, self.rect_coords())
+            self.canvas.tag_raise(self.rect)
 
+    def undo(self, event):
+        if len(self.lines) == 4:
+            self.canvas.coords(self.rect, 0, 0, 0, 0)
+        if len(self.lines) > 0:
+            self.canvas.delete(self.lines[-1])
+            self.lines.pop()
 
-def drag(event):
-    coords["x2"] = event.x
-    coords["y2"] = event.y
+    def rect_coords(self):
+        y1 = self.canvas.coords(self.lines[0])[1]
+        x1 = self.canvas.coords(self.lines[1])[2]
+        y2 = self.canvas.coords(self.lines[2])[1]
+        x2 = self.canvas.coords(self.lines[3])[2]
+        return x1, y1, x2, y2
 
-    if len(lines) % 2 != 0:
-        canvas.coords(lines[-1], 0, coords["y2"], canvas.winfo_width(), coords["y2"])
-    else:
-        canvas.coords(lines[-1], coords["x2"], 0, coords["x2"], canvas.winfo_height())
+    def xywh_rect_coords(self):
+        n_coords = []
+        x1, y1, x2, y2 = self.rect_coords()
+        n_coords.append((x1 + x2) / (2 * self.canvas.winfo_width()))
+        n_coords.append((y1 + y2) / (2 * self.canvas.winfo_height()))
+        n_coords.append(abs(x1 - x2) / self.canvas.winfo_width())
+        n_coords.append(abs(y1 - y2) / self.canvas.winfo_height())
+        return n_coords
 
-    if len(lines) == 4:
-        canvas.coords(rect, rect_coords())
-        canvas.tag_raise(rect)
-        print(xywh_rect_coords())
+    def save(self, event):
+        if len(self.lines) == 4:
+            path = os.path.join(self.dataset_path, self.file_name + ".txt")
+            with open(path, "w") as f:
+                f.write(
+                    f"{self.class_name} {' '.join(str(c) for c in self.xywh_rect_coords())}\n"
+                )
+                f.close()
 
-
-def undo(event):
-    if len(lines) == 4:
-        canvas.coords(rect, 0, 0, 0, 0)
-    if len(lines) > 0:
-        canvas.delete(lines[-1])
-        lines.pop()
-
-
-def rect_coords():
-    # get the 4 intersection points
-    y1 = canvas.coords(lines[0])[1]
-    x1 = canvas.coords(lines[1])[2]
-    y2 = canvas.coords(lines[2])[1]
-    x2 = canvas.coords(lines[3])[2]
-    return x1, y1, x2, y2
-
-
-def xywh_rect_coords():
-    n_coords = []
-    x1, y1, x2, y2 = rect_coords()
-    n_coords.append((x1 + x2) / (2 * canvas.winfo_width()))
-    n_coords.append((y1 + y2) / (2 * canvas.winfo_height()))
-    n_coords.append(abs(x1 - x2) / canvas.winfo_width())
-    n_coords.append(abs(y1 - y2) / canvas.winfo_height())
-    return n_coords
-
-
-def save(event):
-    if len(lines) == 4:
-        path = os.path.join(DATASET_PATH, FILE_NAME + ".txt")
-        with open(path, "w") as f:
-            f.write(f"{CLASS_NAME} {' '.join(str(c) for c in xywh_rect_coords())}\n")
-            f.close()
+    def run(self):
+        self.root.mainloop()
 
 
 # TODO: remove hardcoded paths and names
@@ -109,44 +161,5 @@ DATASET_PATH = "dataset"
 FILE_NAME = "test_file"
 CLASS_NAME = 0
 
-# Main window
-root = tk.Tk()
-root.title("Labeling Tool")
-
-root.resizable(True, False)
-
-# screen dimensions
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-
-# load image
-image = Image.open("dataset/20230828_155817.jpg")
-image_ratio = image.width / image.height
-
-tk_image = ImageTk.PhotoImage(image)
-
-# canvas
-canvas = tk.Canvas(
-    root, width=screen_height * 0.75 * image_ratio, height=screen_height * 0.75
-)
-canvas.pack(expand=tk.YES, fill=tk.BOTH)
-
-# canvas image
-image_item = canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
-
-lines = []
-coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
-
-# rectangle
-rect = canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
-
-new_image = None
-
-# bind events
-canvas.bind("<Configure>", fit_image)
-canvas.bind("<Button-1>", click)
-canvas.bind("<B1-Motion>", drag)
-root.bind("a", undo)
-root.bind("<space>", save)
-
-root.mainloop()
+app = LabelingApp(DATASET_NAME, DATASET_PATH, FILE_NAME, CLASS_NAME)
+app.run()

@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import os
+import os, sys
 
 
 class LabelingApp:
@@ -48,6 +48,10 @@ class LabelingApp:
         self.canvas.bind("<B1-Motion>", self.drag)
         self.root.bind("a", self.undo)
         self.root.bind("<space>", self.save)
+
+    # TODO: implement next_image
+    def next_image(self, event):
+        pass
 
     def fit_image(self, event):
         canvas_width = event.width
@@ -155,11 +159,16 @@ class LabelingApp:
         self.root.mainloop()
 
 
-# TODO: remove hardcoded paths and names
-DATASET_NAME = "test"
-DATASET_PATH = "dataset"
-FILE_NAME = "test_file"
-CLASS_NAME = 0
+if __name__ == "__main__":
+    # TODO: remove hardcoded paths and names
+    DATASET_NAME = "test"
+    FILE_NAME = "test_file"
+    CLASS_NAME = 0
 
-app = LabelingApp(DATASET_NAME, DATASET_PATH, FILE_NAME, CLASS_NAME)
-app.run()
+    if len(sys.argv) < 2:
+        DATASET_PATH = os.path.join(os.getcwd(), "dataset")
+    else:
+        DATASET_PATH = sys.argv[1]
+
+    app = LabelingApp(DATASET_NAME, DATASET_PATH, FILE_NAME, CLASS_NAME)
+    app.run()

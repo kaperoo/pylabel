@@ -7,7 +7,8 @@ class LabelingApp:
     def __init__(self, dataset_name, dataset_path, file_name, class_name):
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
-        self.file_name = file_name
+        # self.file_name = file_name
+        self.file_name = "20230828_155817"
         self.class_name = class_name
 
         self.root = tk.Tk()
@@ -18,8 +19,7 @@ class LabelingApp:
         self.screen_height = self.root.winfo_screenheight()
 
         self.image = Image.open(
-            # os.path.join(self.dataset_path, self.file_name + ".jpg")
-            "dataset\\20230828_155817.jpg"
+            os.path.join(self.dataset_path, self.file_name + ".jpg")
         )
         self.image_ratio = self.image.width / self.image.height
 
@@ -148,12 +148,18 @@ class LabelingApp:
 
     def save(self, event):
         if len(self.lines) == 4:
-            path = os.path.join(self.dataset_path, self.file_name + ".txt")
+            path = os.path.join(self.dataset_path, "labels", self.file_name + ".txt")
             with open(path, "w") as f:
                 f.write(
                     f"{self.class_name} {' '.join(str(c) for c in self.xywh_rect_coords())}\n"
                 )
                 f.close()
+
+            # move image to 'images' folder
+            os.rename(
+                os.path.join(self.dataset_path, self.file_name + ".jpg"),
+                os.path.join(self.dataset_path, "images", self.file_name + ".jpg"),
+            )
 
     def run(self):
         self.root.mainloop()
@@ -165,10 +171,16 @@ if __name__ == "__main__":
     FILE_NAME = "test_file"
     CLASS_NAME = 0
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) == 1:
         DATASET_PATH = os.path.join(os.getcwd(), "dataset")
     else:
         DATASET_PATH = sys.argv[1]
+
+    # check if 'labels' and 'images' folders exist
+    if not os.path.exists(os.path.join(DATASET_PATH, "labels")):
+        os.mkdir(os.path.join(DATASET_PATH, "labels"))
+    if not os.path.exists(os.path.join(DATASET_PATH, "images")):
+        os.mkdir(os.path.join(DATASET_PATH, "images"))
 
     app = LabelingApp(DATASET_NAME, DATASET_PATH, FILE_NAME, CLASS_NAME)
     app.run()

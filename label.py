@@ -1,13 +1,14 @@
 import tkinter as tk
+from tkinter import filedialog
 from PIL import Image, ImageTk
 import os, sys
 
 
 class LabelingApp:
-    def __init__(self, dataset_path, class_name):
+    def __init__(self, dataset_path):
         self.dataset_path = dataset_path
-        self.class_name = class_name
-        self.file_name = ""
+
+        self.load_folder()
 
         self.root = tk.Tk()
         self.root.title("Labeling Tool")
@@ -15,9 +16,6 @@ class LabelingApp:
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
-
-        self.image = None
-        self.tk_image = None
 
         self.image_ratio = 1
 
@@ -28,13 +26,16 @@ class LabelingApp:
         )
         self.canvas.pack(expand=tk.YES, fill=tk.BOTH)
 
+        self.image = None
+        self.tk_image = None
         self.image_item = self.canvas.create_image(
             0, 0, anchor=tk.NW, image=self.tk_image
         )
 
+        self.class_name = 0
+        self.file_name = ""
         self.lines = []
         self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
-
         self.rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
 
         self.next_image(None)
@@ -44,6 +45,11 @@ class LabelingApp:
         self.canvas.bind("<B1-Motion>", self.drag)
         self.root.bind("a", self.undo)
         self.root.bind("<space>", self.save)
+
+    def load_folder(self):
+        folder_selected = filedialog.askdirectory()
+        if folder_selected:
+            self.dataset_path = folder_selected
 
     # TODO: improve this implementation
     def next_image(self, event):
@@ -173,6 +179,10 @@ class LabelingApp:
         n_coords.append(abs(y1 - y2) / self.canvas.winfo_height())
         return n_coords
 
+    # TODO: implement class selection
+    def select_class(self, event):
+        pass
+
     def save(self, event):
         if len(self.lines) == 4:
             path = os.path.join(self.dataset_path, "labels", self.file_name + ".txt")
@@ -195,8 +205,6 @@ class LabelingApp:
 
 if __name__ == "__main__":
     # TODO: remove hardcoded paths and names
-    CLASS_NAME = 0
-
     if len(sys.argv) == 1:
         DATASET_PATH = os.path.join(os.getcwd(), "dataset")
     else:
@@ -208,5 +216,5 @@ if __name__ == "__main__":
     if not os.path.exists(os.path.join(DATASET_PATH, "images")):
         os.mkdir(os.path.join(DATASET_PATH, "images"))
 
-    app = LabelingApp(DATASET_PATH, CLASS_NAME)
+    app = LabelingApp(DATASET_PATH)
     app.run()

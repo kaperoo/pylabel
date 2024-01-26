@@ -4,12 +4,10 @@ import os, sys
 
 
 class LabelingApp:
-    def __init__(self, dataset_name, dataset_path, file_name, class_name):
-        self.dataset_name = dataset_name
+    def __init__(self, dataset_path, class_name):
         self.dataset_path = dataset_path
-        # self.file_name = file_name
-        self.file_name = "20230828_155817"
         self.class_name = class_name
+        self.file_name = ""
 
         self.root = tk.Tk()
         self.root.title("Labeling Tool")
@@ -18,12 +16,10 @@ class LabelingApp:
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
 
-        self.image = Image.open(
-            os.path.join(self.dataset_path, self.file_name + ".jpg")
-        )
-        self.image_ratio = self.image.width / self.image.height
+        self.image = None
+        self.tk_image = None
 
-        self.tk_image = ImageTk.PhotoImage(self.image)
+        self.image_ratio = 1
 
         self.canvas = tk.Canvas(
             self.root,
@@ -41,7 +37,7 @@ class LabelingApp:
 
         self.rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
 
-        self.new_image = None
+        self.next_image(None)
 
         self.canvas.bind("<Configure>", self.fit_image)
         self.canvas.bind("<Button-1>", self.click)
@@ -49,9 +45,40 @@ class LabelingApp:
         self.root.bind("a", self.undo)
         self.root.bind("<space>", self.save)
 
-    # TODO: implement next_image
+    # TODO: improve this implementation
     def next_image(self, event):
-        pass
+        for file in os.listdir(self.dataset_path):
+            if file.endswith(".jpg"):
+                self.canvas.coords(self.rect, 0, 0, 0, 0)
+                for i in self.lines:
+                    self.canvas.delete(i)
+                self.lines = []
+                self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
+
+                self.file_name = file[:-4]
+                self.image = Image.open(
+                    os.path.join(self.dataset_path, self.file_name + ".jpg")
+                )
+                self.image_ratio = self.image.width / self.image.height
+
+                scaling_factor = self.screen_height * 0.75 / self.image.height
+
+                new_width = int(self.image.width * scaling_factor)
+                new_height = int(self.image.height * scaling_factor)
+
+                resized_image = self.image.resize((new_width, new_height))
+
+                self.tk_image = ImageTk.PhotoImage(resized_image)
+
+                self.canvas.itemconfig(self.image_item, image=self.tk_image)
+
+                self.canvas.config(
+                    width=self.screen_height * 0.75 * self.image_ratio,
+                    height=self.screen_height * 0.75,
+                )
+                self.root.geometry(f"{int(new_width)}x{int(new_height)}")
+
+                return
 
     def fit_image(self, event):
         canvas_width = event.width
@@ -62,9 +89,9 @@ class LabelingApp:
         new_width = int(self.image.width * scaling_factor)
         new_height = int(self.image.height * scaling_factor)
         resized_image = self.image.resize((new_width, new_height))
-        self.new_image = ImageTk.PhotoImage(resized_image)
+        self.tk_image = ImageTk.PhotoImage(resized_image)
 
-        self.canvas.itemconfig(self.image_item, image=self.new_image)
+        self.canvas.itemconfig(self.image_item, image=self.tk_image)
 
     def click(self, event):
         self.coords["x1"] = event.x
@@ -160,6 +187,7 @@ class LabelingApp:
                 os.path.join(self.dataset_path, self.file_name + ".jpg"),
                 os.path.join(self.dataset_path, "images", self.file_name + ".jpg"),
             )
+            self.next_image(event)
 
     def run(self):
         self.root.mainloop()
@@ -167,8 +195,6 @@ class LabelingApp:
 
 if __name__ == "__main__":
     # TODO: remove hardcoded paths and names
-    DATASET_NAME = "test"
-    FILE_NAME = "test_file"
     CLASS_NAME = 0
 
     if len(sys.argv) == 1:
@@ -182,5 +208,5 @@ if __name__ == "__main__":
     if not os.path.exists(os.path.join(DATASET_PATH, "images")):
         os.mkdir(os.path.join(DATASET_PATH, "images"))
 
-    app = LabelingApp(DATASET_NAME, DATASET_PATH, FILE_NAME, CLASS_NAME)
+    app = LabelingApp(DATASET_PATH, CLASS_NAME)
     app.run()

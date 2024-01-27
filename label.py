@@ -45,6 +45,8 @@ class LabelingApp:
         self.canvas.bind("<B1-Motion>", self.drag)
         self.root.bind("a", self.undo)
         self.root.bind("<space>", self.save)
+        for i in range(10):
+            self.root.bind(str(i), self.select_class)
 
     def load_folder(self):
         folder_selected = filedialog.askdirectory()
@@ -92,9 +94,12 @@ class LabelingApp:
         scaling_factor = canvas_width / self.image.width
         self.root.geometry(f"{canvas_width}x{canvas_height}")
 
-        new_width = int(self.image.width * scaling_factor)
-        new_height = int(self.image.height * scaling_factor)
-        resized_image = self.image.resize((new_width, new_height))
+        resized_image = self.image.resize(
+            (
+                int(self.image.width * scaling_factor),
+                int(self.image.height * scaling_factor),
+            )
+        )
         self.tk_image = ImageTk.PhotoImage(resized_image)
 
         self.canvas.itemconfig(self.image_item, image=self.tk_image)
@@ -181,7 +186,7 @@ class LabelingApp:
 
     # TODO: implement class selection
     def select_class(self, event):
-        pass
+        self.class_name = event.char
 
     def save(self, event):
         if len(self.lines) == 4:
@@ -211,6 +216,7 @@ if __name__ == "__main__":
         DATASET_PATH = sys.argv[1]
 
     # check if 'labels' and 'images' folders exist
+    # TODO: see if it has to be moved inside the app
     if not os.path.exists(os.path.join(DATASET_PATH, "labels")):
         os.mkdir(os.path.join(DATASET_PATH, "labels"))
     if not os.path.exists(os.path.join(DATASET_PATH, "images")):

@@ -3,3 +3,4 @@ lenv
 test
 notes.md
 dataset
+__pycache__

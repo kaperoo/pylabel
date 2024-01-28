@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+from tooltip import Tooltip
 import os, sys
 
 
@@ -12,7 +13,9 @@ class LabelingApp:
 
         self.root = tk.Tk()
         self.root.title("Labeling Tool")
-        self.root.resizable(True, False)
+        # self.root.resizable(True, False)
+        # TODO: fix resizing
+        self.root.resizable(False, False)
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
@@ -38,12 +41,16 @@ class LabelingApp:
         self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
         self.rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
 
+        self.tog_tool = False
+        self.tool_window = None
+
         self.next_image(None)
 
         self.canvas.bind("<Configure>", self.fit_image)
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind("<B1-Motion>", self.drag)
         self.root.bind("a", self.undo)
+        self.root.bind("u", self.toggle_tooltip)
         self.root.bind("<space>", self.save)
         for i in range(10):
             self.root.bind(str(i), self.select_class)
@@ -203,6 +210,14 @@ class LabelingApp:
                 os.path.join(self.dataset_path, "images", self.file_name + ".jpg"),
             )
             self.next_image(event)
+
+    def toggle_tooltip(self, event):
+        if self.tog_tool:
+            self.tool_window.destroy()
+            self.tog_tool = False
+        else:
+            self.tool_window = Tooltip()
+            self.tog_tool = True
 
     def run(self):
         self.root.mainloop()

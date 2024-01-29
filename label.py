@@ -38,6 +38,7 @@ class LabelingApp:
         self.class_name = 0
         self.file_name = ""
         self.lines = []
+        self.hover_line = None
         self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
         self.rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
 
@@ -49,6 +50,7 @@ class LabelingApp:
         self.canvas.bind("<Configure>", self.fit_image)
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind("<B1-Motion>", self.drag)
+        self.canvas.bind("<Motion>", self.hover)
         self.root.bind("a", self.undo)
         self.root.bind("u", self.toggle_tooltip)
         self.root.bind("<space>", self.save)
@@ -110,6 +112,31 @@ class LabelingApp:
         self.tk_image = ImageTk.PhotoImage(resized_image)
 
         self.canvas.itemconfig(self.image_item, image=self.tk_image)
+
+    def hover(self, event):
+        if self.hover_line:
+            self.canvas.delete(self.hover_line)
+        if len(self.lines) != 4:
+            if len(self.lines) % 2 == 0:
+                self.hover_line = self.canvas.create_line(
+                    0,
+                    event.y,
+                    self.canvas.winfo_width(),
+                    event.y,
+                    fill="lawn green",
+                    width=2,
+                    stipple="gray25", 
+                )
+            else:
+                self.hover_line = self.canvas.create_line(
+                    event.x,
+                    0,
+                    event.x,
+                    self.canvas.winfo_height(),
+                    fill="lawn green",
+                    width=2,
+                    stipple="gray25",  
+                )
 
     def click(self, event):
         self.coords["x1"] = event.x

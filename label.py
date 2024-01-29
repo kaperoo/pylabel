@@ -226,6 +226,8 @@ class LabelingApp:
 if __name__ == "__main__":
     # TODO: remove hardcoded paths and names
     if len(sys.argv) == 1:
+        if not os.path.exists(os.path.join(os.getcwd(), "dataset")):
+            os.mkdir(os.path.join(os.getcwd(), "dataset"))
         DATASET_PATH = os.path.join(os.getcwd(), "dataset")
     else:
         DATASET_PATH = sys.argv[1]

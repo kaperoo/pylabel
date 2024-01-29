@@ -125,7 +125,7 @@ class LabelingApp:
                     event.y,
                     fill="lawn green",
                     width=2,
-                    stipple="gray25", 
+                    stipple="gray25",
                 )
             else:
                 self.hover_line = self.canvas.create_line(
@@ -135,7 +135,7 @@ class LabelingApp:
                     self.canvas.winfo_height(),
                     fill="lawn green",
                     width=2,
-                    stipple="gray25",  
+                    stipple="gray25",
                 )
 
     def click(self, event):
@@ -221,6 +221,7 @@ class LabelingApp:
     # TODO: implement class selection
     def select_class(self, event):
         self.class_name = event.char
+        self.tool_window.update_text(self.class_name)
 
     def save(self, event):
         if len(self.lines) == 4:

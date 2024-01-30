@@ -2,17 +2,22 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from tooltip import Tooltip
+from utils import *
 import os, sys
 
 
 class LabelingApp:
     def __init__(self, dataset_path):
-        self.dataset_path = dataset_path
+        if dataset_path is None:
+            self.dataset_path = self.load_folder()
+        else:
+            self.dataset_path = dataset_path
 
-        self.load_folder()
+        check_dir_tree(self.dataset_path, level=1)
 
         self.root = tk.Tk()
         self.root.title("Labeling Tool")
+
         # self.root.resizable(True, False)
         # TODO: fix resizing
         self.root.resizable(False, False)
@@ -35,6 +40,7 @@ class LabelingApp:
             0, 0, anchor=tk.NW, image=self.tk_image
         )
 
+        self.classes = get_classes(os.path.join(self.dataset_path, "dataset.yaml"))
         self.class_name = 0
         self.file_name = ""
         self.lines = []
@@ -58,9 +64,12 @@ class LabelingApp:
             self.root.bind(str(i), self.select_class)
 
     def load_folder(self):
+        # TODO: figure out a way to get relative path
         folder_selected = filedialog.askdirectory()
         if folder_selected:
-            self.dataset_path = folder_selected
+            return folder_selected
+        else:
+            sys.exit()
 
     # TODO: improve this implementation
     def next_image(self, event):
@@ -141,6 +150,9 @@ class LabelingApp:
     def click(self, event):
         self.coords["x1"] = event.x
         self.coords["y1"] = event.y
+
+        if self.hover_line:
+            self.canvas.delete(self.hover_line)
 
         if len(self.lines) != 4:
             if len(self.lines) % 2 == 0:
@@ -223,6 +235,10 @@ class LabelingApp:
         self.class_name = event.char
         self.tool_window.update_text(self.class_name)
 
+    # TODO: implement new class creation
+    def new_class(self, event):
+        pass
+
     def save(self, event):
         if len(self.lines) == 4:
             path = os.path.join(self.dataset_path, "labels", self.file_name + ".txt")
@@ -254,20 +270,10 @@ class LabelingApp:
 
 
 if __name__ == "__main__":
-    # TODO: remove hardcoded paths and names
-    if len(sys.argv) == 1:
-        if not os.path.exists(os.path.join(os.getcwd(), "dataset")):
-            os.mkdir(os.path.join(os.getcwd(), "dataset"))
-        DATASET_PATH = os.path.join(os.getcwd(), "dataset")
-    else:
+    if len(sys.argv) == 2:
         DATASET_PATH = sys.argv[1]
-
-    # check if 'labels' and 'images' folders exist
-    # TODO: see if it has to be moved inside the app
-    if not os.path.exists(os.path.join(DATASET_PATH, "labels")):
-        os.mkdir(os.path.join(DATASET_PATH, "labels"))
-    if not os.path.exists(os.path.join(DATASET_PATH, "images")):
-        os.mkdir(os.path.join(DATASET_PATH, "images"))
+    else:
+        DATASET_PATH = None
 
     app = LabelingApp(DATASET_PATH)
     app.run()

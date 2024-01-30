@@ -43,8 +43,6 @@ class Tooltip(tk.Toplevel):
             "30: class31",
         ]
 
-        self.search = tk.Entry(self).pack()
-
         self.listbox = tk.Listbox(self)
 
         for i in self.classes:

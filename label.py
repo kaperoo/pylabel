@@ -244,7 +244,9 @@ class LabelingApp:
             self.tool_window.destroy()
             self.tog_tool = False
         else:
-            self.tool_window = Tooltip()
+            x = self.root.winfo_x() + self.root.winfo_width()
+            y = self.root.winfo_y()
+            self.tool_window = Tooltip(x,y)
             self.tog_tool = True
 
     def run(self):

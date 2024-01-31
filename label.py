@@ -51,6 +51,8 @@ class LabelingApp:
         self.tog_tool = False
         self.tool_window = None
 
+        self.new_class_window = None
+
         self.next_image(None)
 
         self.canvas.bind("<Configure>", self.fit_image)
@@ -59,6 +61,7 @@ class LabelingApp:
         self.canvas.bind("<Motion>", self.hover)
         self.root.bind("a", self.undo)
         self.root.bind("u", self.toggle_tooltip)
+        self.root.bind("n", self.new_class)
         self.root.bind("<space>", self.save)
         for i in range(10):
             self.root.bind(str(i), self.select_class)
@@ -239,6 +242,9 @@ class LabelingApp:
     def new_class(self, event):
         pass
 
+    def get_classes(self):
+        return self.classes
+
     def save(self, event):
         if len(self.lines) == 4:
             path = os.path.join(self.dataset_path, "labels", self.file_name + ".txt")
@@ -262,7 +268,7 @@ class LabelingApp:
         else:
             x = self.root.winfo_x() + self.root.winfo_width()
             y = self.root.winfo_y()
-            self.tool_window = Tooltip(x, y)
+            self.tool_window = Tooltip(x, y, self.root, self.get_classes)
             self.tog_tool = True
 
     def run(self):

@@ -2,14 +2,15 @@ import tkinter as tk
 
 
 class Tooltip(tk.Toplevel):
-    def __init__(self, x, y, master, get_classes):
+    def __init__(self, x, y, master, get_classes, set_class):
         super().__init__()
         self.title("Tooltip")
         self.resizable(False, False)
         self.geometry(f"300x400+{x}+{y}")
         self.master = master
 
-        # TODO: remove hardcoded classes
+        self.set_class = set_class
+
         self.classes = get_classes()
         self.listbox = tk.Listbox(self)
 
@@ -26,4 +27,4 @@ class Tooltip(tk.Toplevel):
         self.listbox.selection_set(int(text))
 
     def select_class(self, event):
-        pass
+        print(event.widget.curselection()[0])

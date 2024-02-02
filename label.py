@@ -268,7 +268,9 @@ class LabelingApp:
         else:
             x = self.root.winfo_x() + self.root.winfo_width()
             y = self.root.winfo_y()
-            self.tool_window = Tooltip(x, y, self.root, self.get_classes)
+            self.tool_window = Tooltip(
+                x, y, self.root, self.get_classes, self.select_class
+            )
             self.tog_tool = True
 
     def run(self):

@@ -47,6 +47,10 @@ class LabelingApp:
         self.hover_line = None
         self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
         self.rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="red", width=2)
+        self.str_var = tk.StringVar()
+        self.displayed_label = tk.Label(
+            self.root, textvariable=self.str_var, bg="red", fg="white"
+        )
 
         self.tog_tool = False
         self.tool_window = None
@@ -184,6 +188,12 @@ class LabelingApp:
         if len(self.lines) == 4:
             self.canvas.coords(self.rect, self.rect_coords())
             self.canvas.tag_raise(self.rect)
+            # show label below rectangle
+            self.displayed_label.place(
+                x=self.canvas.coords(self.rect)[0],
+                y=self.canvas.coords(self.rect)[3],
+                anchor=tk.NW,
+            )
 
     def drag(self, event):
         self.coords["x2"] = event.x
@@ -209,6 +219,11 @@ class LabelingApp:
         if len(self.lines) == 4:
             self.canvas.coords(self.rect, self.rect_coords())
             self.canvas.tag_raise(self.rect)
+            self.displayed_label.place(
+                x=self.canvas.coords(self.rect)[0],
+                y=self.canvas.coords(self.rect)[3],
+                anchor=tk.NW,
+            )
 
     def undo(self, event):
         if len(self.lines) == 4:
@@ -236,7 +251,9 @@ class LabelingApp:
     # TODO: implement class selection
     def select_class(self, event):
         self.class_name = event.char
-        self.tool_window.update_text(self.class_name)
+        if self.tool_window:
+            self.tool_window.update_text(self.class_name)
+        self.str_var.set(self.class_name)
 
     # TODO: implement new class creation
     def new_class(self, event):

@@ -28,3 +28,6 @@ class Tooltip(tk.Toplevel):
 
     def select_class(self, event):
         print(event.widget.curselection()[0])
+
+    def search(self, event):
+        pass

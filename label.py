@@ -250,10 +250,11 @@ class LabelingApp:
 
     # TODO: implement class selection
     def select_class(self, event):
-        self.class_name = event.char
-        if self.tool_window:
-            self.tool_window.update_text(self.class_name)
-        self.str_var.set(self.class_name)
+        self.class_name = int(event.char)
+        if len(self.classes) > self.class_name:
+            if self.tool_window:
+                self.tool_window.update_text(self.class_name)
+            self.str_var.set(self.classes[self.class_name])
 
     # TODO: implement new class creation
     def new_class(self, event):

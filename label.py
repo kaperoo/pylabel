@@ -88,6 +88,8 @@ class LabelingApp:
                 self.lines = []
                 self.coords = {"x1": 0, "y1": 0, "x2": 0, "y2": 0}
 
+                self.displayed_label.place_forget()
+
                 self.file_name = file[:-4]
                 self.image = Image.open(
                     os.path.join(self.dataset_path, self.file_name + ".jpg")

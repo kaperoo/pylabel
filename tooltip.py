@@ -11,6 +11,9 @@ class Tooltip(tk.Toplevel):
 
         self.set_class = set_class
 
+        self.search_entry = tk.Entry(self)
+        self.search_entry.pack(fill=tk.X)
+
         self.classes = get_classes()
         self.listbox = tk.Listbox(self)
 
@@ -21,13 +24,17 @@ class Tooltip(tk.Toplevel):
 
         self.listbox.bind("<<ListboxSelect>>", self.select_class)
 
+        # self.new_class_button = tk.Button(self, text="Add a New Class", command=self.new_class)
+
     def update_text(self, text):
         self.listbox.selection_clear(0, tk.END)
         self.listbox.see(int(text))
         self.listbox.selection_set(int(text))
 
     def select_class(self, event):
-        print(event.widget.curselection()[0])
+        if event.widget.curselection():
+            self.set_class(event.widget.curselection()[0])
+            print(event.widget.curselection()[0])
 
     def search(self, event):
         pass

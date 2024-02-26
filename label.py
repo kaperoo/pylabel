@@ -22,6 +22,9 @@ class LabelingApp:
         # TODO: fix resizing
         self.root.resizable(False, False)
 
+        self.root.attributes("-topmost", True)
+        self.root.focus_force()
+
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
 
@@ -252,7 +255,10 @@ class LabelingApp:
 
     # TODO: implement class selection
     def select_class(self, event):
-        self.class_name = int(event.char)
+        if type(event) == int:
+            self.class_name = event
+        else:
+            self.class_name = int(event.char)
         if len(self.classes) > self.class_name:
             if self.tool_window:
                 self.tool_window.update_text(self.class_name)

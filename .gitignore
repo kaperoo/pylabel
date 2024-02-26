@@ -1,5 +1,6 @@
 lenv
 *.jpg
+.*
 test
 notes.md
 dataset

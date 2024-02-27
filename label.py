@@ -265,8 +265,8 @@ class LabelingApp:
             self.str_var.set(self.classes[self.class_name])
 
     # TODO: implement new class creation
-    def new_class(self, event):
-        pass
+    def new_class(self, event=None):
+        print("new class")
 
     def get_classes(self):
         return self.classes
@@ -295,7 +295,7 @@ class LabelingApp:
             x = self.root.winfo_x() + self.root.winfo_width()
             y = self.root.winfo_y()
             self.tool_window = Tooltip(
-                x, y, self.root, self.get_classes, self.select_class
+                x, y, self.get_classes, self.select_class, self.new_class
             )
             self.tog_tool = True
 

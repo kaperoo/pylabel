@@ -2,14 +2,14 @@ import tkinter as tk
 
 
 class Tooltip(tk.Toplevel):
-    def __init__(self, x, y, master, get_classes, set_class):
+    def __init__(self, x, y, get_classes, set_class, new_class):
         super().__init__()
         self.title("Tooltip")
         self.resizable(False, False)
         self.geometry(f"300x400+{x}+{y}")
-        self.master = master
 
         self.set_class = set_class
+        self.new_class = new_class
 
         self.search_entry = tk.Entry(self)
         self.search_entry.pack(fill=tk.X)
@@ -24,7 +24,10 @@ class Tooltip(tk.Toplevel):
 
         self.listbox.bind("<<ListboxSelect>>", self.select_class)
 
-        # self.new_class_button = tk.Button(self, text="Add a New Class", command=self.new_class)
+        self.new_class_button = tk.Button(self, 
+                                          text="New Class", 
+                                          command=lambda: self.new_class())
+        self.new_class_button.pack(fill=tk.X)
 
     def update_text(self, text):
         self.listbox.selection_clear(0, tk.END)
@@ -34,7 +37,6 @@ class Tooltip(tk.Toplevel):
     def select_class(self, event):
         if event.widget.curselection():
             self.set_class(event.widget.curselection()[0])
-            print(event.widget.curselection()[0])
 
     def search(self, event):
         pass

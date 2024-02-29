@@ -266,7 +266,16 @@ class LabelingApp:
 
     # TODO: implement new class creation
     def new_class(self, event=None):
-        print("new class")
+        self.new_class_window = tk.Toplevel()
+        self.new_class_window.title("New Class")
+        self.new_class_window.geometry("200x100")
+        self.new_class_window.resizable(False, False)
+
+        self.new_class_label = tk.Label(self.new_class_window, text="New Class Name")
+        self.new_class_label.pack()
+
+        self.new_class_entry = tk.Entry(self.new_class_window)
+        self.new_class_entry.pack()
 
     def get_classes(self):
         return self.classes

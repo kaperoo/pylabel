@@ -274,8 +274,16 @@ class LabelingApp:
         self.new_class_label = tk.Label(self.new_class_window, text="New Class Name")
         self.new_class_label.pack()
 
+        self.new_class_number_label = tk.Label(
+            self.new_class_window, text="%s:" % len(self.classes)
+        )
         self.new_class_entry = tk.Entry(self.new_class_window)
-        self.new_class_entry.pack()
+        self.new_class_number_label.pack(side=tk.LEFT)
+        self.new_class_entry.pack(side=tk.LEFT, fill=tk.X)
+
+        # checkmark button on the right
+        self.new_class_button = tk.Button(self.new_class_window, text="OK")
+        self.new_class_button.pack(side=tk.RIGHT)
 
     def get_classes(self):
         return self.classes

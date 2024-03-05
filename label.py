@@ -268,22 +268,25 @@ class LabelingApp:
     def new_class(self, event=None):
         self.new_class_window = tk.Toplevel()
         self.new_class_window.title("New Class")
-        self.new_class_window.geometry("200x100")
+        self.new_class_window.geometry("200x50")
         self.new_class_window.resizable(False, False)
 
+        self.new_class_window.attributes("-topmost", True)
+        self.new_class_window.overrideredirect(True)
+
         self.new_class_label = tk.Label(self.new_class_window, text="New Class Name")
-        self.new_class_label.pack()
+        self.new_class_label.grid(row=0, column=0, columnspan=2)
 
         self.new_class_number_label = tk.Label(
             self.new_class_window, text="%s:" % len(self.classes)
         )
-        self.new_class_entry = tk.Entry(self.new_class_window)
-        self.new_class_number_label.pack(side=tk.LEFT)
-        self.new_class_entry.pack(side=tk.LEFT, fill=tk.X)
+        self.new_class_entry = tk.Entry(self.new_class_window, width=25)
+        self.new_class_number_label.grid(row=1, column=0)
+        self.new_class_entry.grid(row=1, column=1)
 
         # checkmark button on the right
         self.new_class_button = tk.Button(self.new_class_window, text="OK")
-        self.new_class_button.pack(side=tk.RIGHT)
+        self.new_class_button.grid(row=1, column=2)
 
     def get_classes(self):
         return self.classes

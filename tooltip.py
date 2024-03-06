@@ -24,9 +24,9 @@ class Tooltip(tk.Toplevel):
 
         self.listbox.bind("<<ListboxSelect>>", self.select_class)
 
-        self.new_class_button = tk.Button(self, 
-                                          text="New Class", 
-                                          command=lambda: self.new_class())
+        self.new_class_button = tk.Button(
+            self, text="New Class", command=lambda: self.new_class()
+        )
         self.new_class_button.pack(fill=tk.X)
 
     def update_text(self, text):

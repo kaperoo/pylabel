@@ -27,8 +27,9 @@ def add_class(path, class_name):
 
     else:
         if class_name in data["names"].values():
-            return
+            return -1
 
+        # TODO: This seems overly complicated
         last_index = 0
         for i in data["names"]:
             if int(i) > last_index:

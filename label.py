@@ -272,7 +272,7 @@ class LabelingApp:
         self.new_class_window.resizable(False, False)
 
         self.new_class_window.attributes("-topmost", True)
-        self.new_class_window.overrideredirect(True)
+        # self.new_class_window.overrideredirect(True)
 
         self.new_class_label = tk.Label(self.new_class_window, text="New Class Name")
         self.new_class_label.grid(row=0, column=0, columnspan=2)
@@ -285,7 +285,14 @@ class LabelingApp:
         self.new_class_entry.grid(row=1, column=1)
 
         # checkmark button on the right
-        self.new_class_button = tk.Button(self.new_class_window, text="OK")
+        self.new_class_button = tk.Button(
+            self.new_class_window,
+            text="OK",
+            command=lambda: add_class(
+                os.path.join(self.dataset_path, "dataset.yaml"),
+                self.new_class_entry.get(),
+            ),
+        )
         self.new_class_button.grid(row=1, column=2)
 
     def get_classes(self):

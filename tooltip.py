@@ -29,7 +29,13 @@ class Tooltip(tk.Toplevel):
         )
         self.new_class_button.pack(fill=tk.X)
 
-    def update_text(self, text):
+    def update_classes(self, classes):
+        # TODO: see if clearing the listbox is necessary
+        self.listbox.delete(0, tk.END)
+        for i, v in classes.items():
+            self.listbox.insert(tk.END, f"{i}: {v}")
+
+    def update_selection(self, text):
         self.listbox.selection_clear(0, tk.END)
         self.listbox.see(int(text))
         self.listbox.selection_set(int(text))

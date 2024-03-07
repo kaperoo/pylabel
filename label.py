@@ -261,7 +261,7 @@ class LabelingApp:
             self.class_name = int(event.char)
         if len(self.classes) > self.class_name:
             if self.tool_window:
-                self.tool_window.update_text(self.class_name)
+                self.tool_window.update_selection(self.class_name)
             self.str_var.set(self.classes[self.class_name])
 
     # TODO: implement new class creation
@@ -284,14 +284,22 @@ class LabelingApp:
         self.new_class_number_label.grid(row=1, column=0)
         self.new_class_entry.grid(row=1, column=1)
 
+        # focus on entry
+        self.new_class_entry.focus_set()
+
+        # TODO: See if it can be done better
+        def execute_add_class():
+            add_class(
+                os.path.join(self.dataset_path, "dataset.yaml"),
+                self.new_class_entry.get(),
+            )
+            self.new_class_window.destroy()
+
         # checkmark button on the right
         self.new_class_button = tk.Button(
             self.new_class_window,
             text="OK",
-            command=lambda: add_class(
-                os.path.join(self.dataset_path, "dataset.yaml"),
-                self.new_class_entry.get(),
-            ),
+            command= execute_add_class,
         )
         self.new_class_button.grid(row=1, column=2)
 

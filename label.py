@@ -268,7 +268,7 @@ class LabelingApp:
     def new_class(self, event=None):
         self.new_class_window = tk.Toplevel()
         self.new_class_window.title("New Class")
-        self.new_class_window.geometry("200x50")
+        self.new_class_window.geometry(f"200x50+{int(self.root.winfo_x() + self.root.winfo_width()/2)}+{int(self.root.winfo_y() + self.root.winfo_height()/2)}")
         self.new_class_window.resizable(False, False)
 
         self.new_class_window.attributes("-topmost", True)

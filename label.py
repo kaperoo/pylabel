@@ -266,9 +266,13 @@ class LabelingApp:
 
     # TODO: implement new class creation
     def new_class(self, event=None):
+        if self.new_class_window:
+            self.new_class_window.destroy()
         self.new_class_window = tk.Toplevel()
         self.new_class_window.title("New Class")
-        self.new_class_window.geometry(f"200x50+{int(self.root.winfo_x() + self.root.winfo_width()/2 - 100)}+{int(self.root.winfo_y() + self.root.winfo_height()/2 - 25)}")
+        self.new_class_window.geometry(
+            f"200x50+{int(self.root.winfo_x() + self.root.winfo_width()/2 - 100)}+{int(self.root.winfo_y() + self.root.winfo_height()/2 - 25)}"
+        )
         self.new_class_window.resizable(False, False)
 
         self.new_class_window.attributes("-topmost", True)
@@ -293,13 +297,18 @@ class LabelingApp:
                 os.path.join(self.dataset_path, "dataset.yaml"),
                 self.new_class_entry.get(),
             )
+            self.tool_window.update_classes(
+                get_classes(os.path.join(self.dataset_path, "dataset.yaml"))
+            )
+            self.classes = get_classes(os.path.join(self.dataset_path, "dataset.yaml"))
+
             self.new_class_window.destroy()
 
         # checkmark button on the right
         self.new_class_button = tk.Button(
             self.new_class_window,
             text="OK",
-            command= execute_add_class,
+            command=execute_add_class,
         )
         self.new_class_button.grid(row=1, column=2)
 

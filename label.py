@@ -274,6 +274,10 @@ class LabelingApp:
             f"200x50+{int(self.root.winfo_x() + self.root.winfo_width()/2 - 100)}+{int(self.root.winfo_y() + self.root.winfo_height()/2 - 25)}"
         )
         self.new_class_window.resizable(False, False)
+        self.new_class_window.bind("<Return>", lambda e: self.new_class_button.invoke())
+        self.new_class_window.bind(
+            "<Escape>", lambda e: self.new_class_window.destroy()
+        )
 
         self.new_class_window.attributes("-topmost", True)
         # self.new_class_window.overrideredirect(True)

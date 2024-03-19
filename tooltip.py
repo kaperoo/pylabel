@@ -23,6 +23,7 @@ class Tooltip(tk.Toplevel):
         self.listbox.pack(expand=True, fill=tk.BOTH)
 
         self.listbox.bind("<<ListboxSelect>>", self.select_class)
+        self.search_entry.bind("<KeyRelease>", self.search)
 
         self.new_class_button = tk.Button(
             self, text="New Class", command=lambda: self.new_class()
@@ -45,4 +46,16 @@ class Tooltip(tk.Toplevel):
             self.set_class(event.widget.curselection()[0])
 
     def search(self, event):
-        pass
+        search = self.search_entry.get()
+        if not search:
+            self.listbox.selection_clear(0, tk.END)
+            return
+        for i, v in self.classes.items():
+            if search.lower() in v.lower():
+                self.listbox.selection_clear(0, tk.END)
+                self.listbox.see(int(i))
+                self.listbox.selection_set(int(i))
+                break
+
+    def focus_entry(self, event):
+        self.search_entry.focus()

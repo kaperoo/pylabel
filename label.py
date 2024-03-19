@@ -68,6 +68,7 @@ class LabelingApp:
         self.canvas.bind("<Motion>", self.hover)
         self.root.bind("a", self.undo)
         self.root.bind("u", self.toggle_tooltip)
+        self.root.bind("s", self.search)
         self.root.bind("n", self.new_class)
         self.root.bind("<space>", self.save)
         for i in range(10):
@@ -315,6 +316,10 @@ class LabelingApp:
             command=execute_add_class,
         )
         self.new_class_button.grid(row=1, column=2)
+
+    def search(self, event):
+        if self.tog_tool:
+            self.tool_window.focus_entry(event)
 
     def get_classes(self):
         return self.classes

@@ -63,3 +63,57 @@ def check_dir_tree(path, level=0):
             os.mkdir(os.path.join(path, "labels", "train"))
         if not os.path.exists(os.path.join(path, "labels", "val")):
             os.mkdir(os.path.join(path, "labels", "val"))
+
+
+# TODO: definitely improve this function
+# maybe random shuffle the images before partitioning?
+def partition_dataset(path, ratio_train=8, ratio_val=2, ratio_test=0):
+    train_r = ratio_train / (ratio_train + ratio_val + ratio_test)
+    val_r = ratio_val / (ratio_train + ratio_val + ratio_test)
+    test_r = ratio_test / (ratio_train + ratio_val + ratio_test)
+
+    images = os.listdir(os.path.join(path, "images"))
+    labels = os.listdir(os.path.join(path, "labels"))
+
+    # create train, val, test directories
+    if not os.path.exists(os.path.join(path, "images", "train")):
+        os.mkdir(os.path.join(path, "images", "train"))
+    if not os.path.exists(os.path.join(path, "images", "val")):
+        os.mkdir(os.path.join(path, "images", "val"))
+    if not os.path.exists(os.path.join(path, "images", "test")):
+        os.mkdir(os.path.join(path, "images", "test"))
+    if not os.path.exists(os.path.join(path, "labels", "train")):
+        os.mkdir(os.path.join(path, "labels", "train"))
+    if not os.path.exists(os.path.join(path, "labels", "val")):
+        os.mkdir(os.path.join(path, "labels", "val"))
+    if not os.path.exists(os.path.join(path, "labels", "test")):
+        os.mkdir(os.path.join(path, "labels", "test"))
+
+    for i in range(len(images)):
+        if i < len(images) * train_r:
+            os.rename(
+                os.path.join(path, "images", images[i]),
+                os.path.join(path, "images", "train", images[i]),
+            )
+            os.rename(
+                os.path.join(path, "labels", labels[i]),
+                os.path.join(path, "labels", "train", labels[i]),
+            )
+        elif i < len(images) * (train_r + val_r):
+            os.rename(
+                os.path.join(path, "images", images[i]),
+                os.path.join(path, "images", "val", images[i]),
+            )
+            os.rename(
+                os.path.join(path, "labels", labels[i]),
+                os.path.join(path, "labels", "val", labels[i]),
+            )
+        else:
+            os.rename(
+                os.path.join(path, "images", images[i]),
+                os.path.join(path, "images", "test", images[i]),
+            )
+            os.rename(
+                os.path.join(path, "labels", labels[i]),
+                os.path.join(path, "labels", "test", labels[i]),
+            )

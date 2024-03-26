@@ -1,4 +1,4 @@
-import os, sys, yaml
+import os, sys, yaml, random
 
 
 # create an empty yaml file used for yolo training
@@ -74,6 +74,9 @@ def partition_dataset(path, ratio_train=8, ratio_val=2, ratio_test=0):
 
     images = os.listdir(os.path.join(path, "images"))
     labels = os.listdir(os.path.join(path, "labels"))
+
+    indexes = [i for i in range(len(images))]
+    random.shuffle(indexes)
 
     # create train, val, test directories
     if not os.path.exists(os.path.join(path, "images", "train")):

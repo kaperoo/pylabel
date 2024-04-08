@@ -92,31 +92,32 @@ def partition_dataset(path, ratio_train=8, ratio_val=2, ratio_test=0):
     if not os.path.exists(os.path.join(path, "labels", "test")):
         os.mkdir(os.path.join(path, "labels", "test"))
 
-    for i in range(len(images)):
+    # TODO: check if it works
+    for i, ind in enumerate(indexes):
         if i < len(images) * train_r:
             os.rename(
-                os.path.join(path, "images", images[i]),
-                os.path.join(path, "images", "train", images[i]),
+                os.path.join(path, "images", images[ind]),
+                os.path.join(path, "images", "train", images[ind]),
             )
             os.rename(
-                os.path.join(path, "labels", labels[i]),
-                os.path.join(path, "labels", "train", labels[i]),
+                os.path.join(path, "labels", labels[ind]),
+                os.path.join(path, "labels", "train", labels[ind]),
             )
         elif i < len(images) * (train_r + val_r):
             os.rename(
-                os.path.join(path, "images", images[i]),
-                os.path.join(path, "images", "val", images[i]),
+                os.path.join(path, "images", images[ind]),
+                os.path.join(path, "images", "val", images[ind]),
             )
             os.rename(
-                os.path.join(path, "labels", labels[i]),
-                os.path.join(path, "labels", "val", labels[i]),
+                os.path.join(path, "labels", labels[ind]),
+                os.path.join(path, "labels", "val", labels[ind]),
             )
         else:
             os.rename(
-                os.path.join(path, "images", images[i]),
-                os.path.join(path, "images", "test", images[i]),
+                os.path.join(path, "images", images[ind]),
+                os.path.join(path, "images", "test", images[ind]),
             )
             os.rename(
-                os.path.join(path, "labels", labels[i]),
-                os.path.join(path, "labels", "test", labels[i]),
+                os.path.join(path, "labels", labels[ind]),
+                os.path.join(path, "labels", "test", labels[ind]),
             )
